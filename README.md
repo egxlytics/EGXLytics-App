@@ -1,2 +1,2 @@
-# egxpy-App
+# EGXLytics App
 App Basic
