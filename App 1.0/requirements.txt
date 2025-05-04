@@ -1,0 +1,12 @@
+numpy 
+pandas
+datetime
+streamlit
+holidays
+retry
+XlsxWriter
+plotly
+scipy
+git+https://github.com/rongardF/tvdatafeed.git
+gspread
+oauth2client
