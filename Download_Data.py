@@ -64,6 +64,9 @@ def eod_cache_func(tickers, interval, start, end, date):
 st.set_page_config(page_title="Download Data", layout='wide')
 
 
+st.markdown("""
+<iframe src="https://omar-abouyoussef.github.io/ga-tracker/ga.html" width="0" height="0" style="display:none;"></iframe>
+""", unsafe_allow_html=True)
 
 st.markdown("""
     <style>
@@ -138,6 +141,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 st.sidebar.page_link("pages/Contact_API.py", label="📞 Contact & API")
 
