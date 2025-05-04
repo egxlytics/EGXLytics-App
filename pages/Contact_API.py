@@ -12,23 +12,18 @@ st.markdown("<h1 style='text-align: center;'>📞 Contact & API Access</h1>", un
 st.subheader("📩 Contact Us")
 st.write("""
 If you have any inquiries, feel free to reach out!  
-- 📧 **Email**: anno.adham@gmail.com
-- 📧 **Email**: o.abouyoussef73@gmail.com
-- 🔗 **LinkedIn**: [EGXLytics](https://www.linkedin.com/company/egxlytics)  
--  **WhatsApp**: +20 100 8579698
+- 📧 **Email**: egxlytics@gmail.com
+- 🔗 **LinkedIn**: [EGXLytics](https://www.linkedin.com/company/egxlytics)
 """)
 
 # API Access Information
 st.subheader("🔑 API Access")
 st.write("""
 🚀 **Coming Soon Features:**  
-- ✅ Intraday & Historical Data (1-min, daily, weekly, monthly) 
-- ✅ JSON & CSV Support  
-- ✅ Portfolio Optimization and Index Tracking Portoflios
+- ✅ Index Tracking Portoflios
 - ✅ Volatility Modelling
 - **Future Plans:**
 - ✅ Automated Financial Modelling and DCF Models
-- ✅ Robo Advisors
 
 """)
 
