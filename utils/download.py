@@ -10,7 +10,7 @@ from datetime import datetime as dt
 import streamlit as st
 
 
-@retry((Exception), tries=20, delay=0.5, backoff=0)
+@retry((Exception), tries=10, delay=0.5, backoff=0)
 @st.cache_data
 def get_OHLCV_data(symbol,exchange,interval,n_bars, date):
     """fetches close prices for a single ticker
@@ -36,7 +36,7 @@ def get_OHLCV_data(symbol,exchange,interval,n_bars, date):
 
 
 
-@retry((Exception), tries=20, delay=0.5, backoff=0)
+@retry((Exception), tries=10, delay=0.5, backoff=0)
 def _get_intraday_close_price_data(symbol,exchange,interval,n_bars):
     """fetches close prices for a single ticker
 
@@ -59,7 +59,7 @@ def _get_intraday_close_price_data(symbol,exchange,interval,n_bars):
                     exchange=exchange,interval=interval_dic[interval], n_bars=n_bars, timeout=-1)['close']
     return response
 
-@retry((Exception), tries=20, delay=0.5, backoff=0)
+@retry((Exception), tries=10, delay=0.5, backoff=0)
 @st.cache_data
 def _get_close_price_data(symbol,exchange,interval,n_bars, date):
     """fetches close prices for a single ticker
