@@ -11,3 +11,4 @@ riskfolio-lib
 git+https://github.com/rongardF/tvdatafeed.git
 gspread
 oauth2client
+yfinance
