@@ -1,4 +1,5 @@
 from tvDatafeed import TvDatafeedLive, TvDatafeed, Interval
+import yfinance as yf
 from retry import retry
 import time
 from datetime import timedelta, date
@@ -85,18 +86,83 @@ def _get_close_price_data(symbol,exchange,interval,n_bars, date):
 
 
 
+# @st.cache_data
+# def get_EGXdata(stock_list:list, interval:str, start:date, end:date, date:date):
+
+#     date=dt.today().date()
+#     n = holidays.country_holidays('EG').get_working_days_count(start,end)
+
+
+
+#     close_prices_dic = {}
+#     try:
+#         for stock in stock_list:
+#             close = _get_close_price_data(symbol=stock,exchange='EGX',interval=interval,n_bars=n,date=date)
+#             close_prices_dic[stock]=close
+#     except:
+#         pass
+#     df = pd.concat(close_prices_dic,axis=1)
+#     df.index = pd.to_datetime(df.index.date)
+#     df.index.name = 'Date'
+
+
+#     return df.loc[start:end,:]
+
+
+# def get_EGX_intraday_data(stock_list:list, interval:str, start:date, end:date):
+
+#     date=dt.today().date()
+#     n =5000
+
+
+
+#     close_prices_dic = {}
+#     try:
+#         for stock in stock_list:
+#             close = _get_intraday_close_price_data(symbol=stock,exchange='EGX',interval=interval,n_bars=n)
+#             close_prices_dic[stock]=close
+#     except:
+#         pass
+#     df = pd.concat(close_prices_dic,axis=1)
+
+#     return df.loc[start:end,:].tz_localize("Europe/London").tz_convert("UTC+02:00")
+
 @st.cache_data
-def get_EGXdata(stock_list:list, interval:str, start:date, end:date, date:date):
+def get_USdata(tickers:list, start:date, end:date, interval:str):
+
+
+    df = pd.DataFrame()
+    try:
+        df = yf.download(tickers=tickers,start=start,end=end,interval=interval)['Close']
+        
+        if len(df) ==0:
+            try: 
+                df = yf.download(tickers=tickers,interval=interval,period='max')['Close']
+                print('Limited data')
+            except:
+                raise ValueError('Failed to Download')
+
+    except:
+        raise ValueError('Failed to download data')
+    
+    return df
+
+input_countrycode_dict = {'Egypt':'EG', 'Saudi Arabia':'SA'}
+countrycode_exchange_dict = {'EG':'EGX', 'SA':'TADAWUL'}
+
+@st.cache_data
+def get_close_single_exchange_countries(country, stock_list:list, interval:str, start:date, end:date, date:date):
 
     date=dt.today().date()
-    n = holidays.country_holidays('EG').get_working_days_count(start,end)
-
-
+    n = holidays.country_holidays(input_countrycode_dict[country]).get_working_days_count(start,end)
 
     close_prices_dic = {}
     try:
         for stock in stock_list:
-            close = _get_close_price_data(symbol=stock,exchange='EGX',interval=interval,n_bars=n,date=date)
+            close = _get_close_price_data(
+                symbol=stock,exchange=countrycode_exchange_dict[input_countrycode_dict[country]],
+                interval=interval,n_bars=n,
+                date=date)
             close_prices_dic[stock]=close
     except:
         pass
@@ -108,32 +174,23 @@ def get_EGXdata(stock_list:list, interval:str, start:date, end:date, date:date):
     return df.loc[start:end,:]
 
 
-def get_EGX_intraday_data(stock_list:list, interval:str, start:date, end:date):
+def get_intraday_close_single_exchange_countries(country:str, stock_list:list, interval:str, start:date, end:date):
 
     date=dt.today().date()
     n =5000
 
-
-
     close_prices_dic = {}
     try:
         for stock in stock_list:
-            close = _get_intraday_close_price_data(symbol=stock,exchange='EGX',interval=interval,n_bars=n)
+            close = _get_intraday_close_price_data(
+                symbol=stock,exchange=countrycode_exchange_dict[input_countrycode_dict[country]],
+                interval=interval,
+                n_bars=n
+                )
             close_prices_dic[stock]=close
+               
     except:
         pass
     df = pd.concat(close_prices_dic,axis=1)
 
-    return df.loc[start:end,:].tz_localize("Europe/London").tz_convert("UTC+02:00")
-
-
-
-
-
-
-# start=date(2025,3,1)
-# end=dt.today().date()
-# print(get_EGXdata(stock_list=['ABUK'],interval='Monthly',start=start,end=end,date=end))
-
-# # print(_get_price_data('ABUK','EGX','Daily',25,end))
-    
+    return df.loc[start:end,:].tz_localize(None)
