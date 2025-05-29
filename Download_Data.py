@@ -3,7 +3,7 @@ from datetime import datetime as dt
 import pandas as pd
 import numpy as np
 import io
-from utils.download import get_EGXdata, get_EGX_intraday_data, get_OHLCV_data
+from utils.download import get_close_single_exchange_countries, get_intraday_close_single_exchange_countries, get_OHLCV_data, get_USdata
 from utils.download import _get_intraday_close_price_data
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -40,7 +40,7 @@ def to_excel(df):
 @st.cache_data
 def eod_cache_func(tickers, interval, start, end, date):
     def fetch_single_ticker(ticker):
-        df = get_EGXdata([ticker], interval, start, end)
+        df = get_EGXdata([ticker], interval, start, end,date)
         if isinstance(df, pd.DataFrame):
             df.columns = [ticker]  # Rename to match ticker
         return df
@@ -151,7 +151,12 @@ st.title('Download Data')
 ##############################
 #inputs
 ##########################
-#Tickers
+market = st.selectbox(label='Country',
+                       options = ['Egypt', 'US', 'Saudi Arabia'],
+                       key='market',
+                      )
+market = st.session_state.market
+
 tickers = st.text_input(label='Ticker(s): Enter all Caps',
                        key = 'tickers',
                        value='ABUK',
@@ -176,15 +181,37 @@ date = dt.today().date()
 
 if start < end:
     start_time = time.time()
-    if interval in ['1 Minute','5 Minute','30 Minute']:
-            df = get_EGX_intraday_data(tickers.split(" "),interval,start,end)
+    if market != 'US':
+
+        if interval in ['1 Minute','5 Minute','30 Minute']:
+                df = get_intraday_close_single_exchange_countries(country=market,
+                                                                  stock_list=tickers.split(" "),
+                                                                  interval=interval,
+                                                                  start=start,end=end)
+
+        else:
+            df = get_close_single_exchange_countries(country=market,
+                                                     stock_list=tickers.split(" "),
+                                                     interval=interval,
+                                                     start=start,end=end,
+                                                     date=date)
+            df.index = df.index.date
+    
+    elif market == 'US':
+
+       input_yf_interval_dict = {'Daily':'1d','Weekly':'1wk','Monthly':'1mo',
+                                 '1 Minute':'1m','5 Minute':'5m','30 Minute':'30m'}
+
+       df = get_USdata(tickers=tickers,start=start,end=end,interval=input_yf_interval_dict[interval])
 
     else:
-        df = get_EGXdata(tickers.split(" "),interval,start,end,date)
-        df.index = df.index.date
+        pass
+
     end_time = time.time()
     st.write(f"Fetched in: {end_time - start_time:.2f} seconds")
+
     st.write(df)
+
 # Download Button
     st.download_button(
         label="Download Data",
@@ -198,5 +225,4 @@ else:
     pass
 
 
-st.write("Note: Intraday data is delayed by 20 minutes.")
-
+st.write("Note: Intraday data is delayed by 20 minutes,and limited to maximum dates.")
